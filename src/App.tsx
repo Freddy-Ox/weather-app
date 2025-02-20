@@ -1,23 +1,12 @@
 import { useState, useEffect, FormEvent } from "react";
 import { API_KEY } from "./API/api.ts";
+import DisplayWeather from "./components/CurrentWeather.tsx";
+import HourlyForecast from "./components/HourlyForecast.tsx";
+import { Component } from "./components/DisplayHourlyForecast.tsx";
 import "./index.css";
 
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-type WeatherData = {
-  city: string;
-  temperature: number;
-  feels_like: number;
-  description: string;
-  icon: string;
-  wind_speed: number;
-  wind_gusts: number;
-  wind_direction: number;
-  cloudiness: number;
-  sunrise: number;
-  sunset: number;
-  time: number;
-};
+const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
 async function getWeather(city: string) {
   const response = await fetch(
@@ -60,10 +49,6 @@ export default function WeatherComponent() {
   if (error) return <p>Error: {error}</p>;
   if (!weatherData) return <p>Loading...</p>;
 
-  function handleClick(): void {
-    setCity("aarhus");
-  }
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -72,7 +57,7 @@ export default function WeatherComponent() {
     setCity(cityName);
   }
 
-  const date = new Date(weatherData.time * 1000);
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center">
@@ -85,18 +70,8 @@ export default function WeatherComponent() {
           Search
         </button>
       </form>
-      <h2 className="text-2xl font-bold mt-4">{weatherData.city}</h2>
-      <p>{date.toLocaleDateString() + " " + date.toLocaleTimeString()}</p>
-      <p>{weatherData.description}</p>
-      <p className="text-lg font-semibold">
-        🌡️ {Math.round(weatherData.temperature)}°C
-      </p>{" "}
-      <p>Feels like {Math.round(weatherData.feels_like)}°C</p>
-      <img
-        src={`https://openweathermap.org/img/wn/${weatherData.icon}@2x.png`}
-        alt={weatherData.description}
-        className="w-24 h-24 mt-4"
-      />
+      <DisplayWeather weatherProps={weatherData}></DisplayWeather>
+      <Component></Component>
     </div>
   );
 }
