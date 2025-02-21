@@ -24,25 +24,28 @@ export function InfoPanels({ data }: InfoPanelsProps) {
   return (
     <>
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-        <ResizablePanel className="bg-green-300">
+        <ResizablePanel className="bg-transparent">
           <div className="flex h-full items-center justify-center p-6 flex-col">
             <WiStrongWind size={50} />
             <p className="text-2xl mb-4">
               Windspeeds of {Math.round(data.wind_speed)} m/s
             </p>
             <p className="text-lg">
-              Gusts of {Math.round(data.wind_gusts)} m/s
+              {isNaN(data.wind_gusts) ? "Calm winds with no gusts" : `Gusts of ${Math.round(data.wind_gusts)} m/s`}
             </p>
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
 
-      <ResizablePanelGroup direction="horizontal" className="rounded-lg border mx-4">
-        <ResizablePanel className="bg-rose-300">
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="rounded-lg border mx-4"
+      >
+        <ResizablePanel className="bg-transparent">
           <div className="flex h-full items-center justify-center p-6 flex-col">
             <WiThermometer size={50} />
             <p className="text-2xl mb-4">
-              Temperature right now: {Math.round(data.temperature * 10) / 10}°C
+              Temperature {Math.round(data.temperature * 10) / 10}°C
             </p>
             <p className="text-lg">
               Feels like {Math.round(data.feels_like * 10) / 10}°C
@@ -52,9 +55,13 @@ export function InfoPanels({ data }: InfoPanelsProps) {
       </ResizablePanelGroup>
 
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
-        <ResizablePanel className="bg-emerald-100">
+        <ResizablePanel className="bg-transparent">
           <div className="flex h-full items-center justify-center p-6 flex-col">
-            <WiCloud size={50} />
+            <img
+              src={`https://openweathermap.org/img/wn/${data.icon}@2x.png`}
+              alt={data.description}
+              className="w-16 h-16 -mt-4"
+            />
             <p className="text-2xl mb-4">{data.description}</p>
             <p className="text-lg">with {data.cloudiness}% cloudcover </p>
           </div>

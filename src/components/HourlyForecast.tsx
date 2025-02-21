@@ -50,10 +50,11 @@ async function getHourlyForecast(cityName: string) {
 
 export default function HourlyForecast({ cityName }: HourlyForecastProps) {
   const [hourlyForecastData, setHourlyForecastData] = useState([]);
+  const [error, setError] = useState()
 
   useEffect(() => {
-    getHourlyForecast(cityName).then(setHourlyForecastData);
-  }, [cityName]);
+    getHourlyForecast(cityName).then(setHourlyForecastData).catch(error);
+  }, [cityName, error]);
 
   const chartDataHourly = formatHourlyChartData(hourlyForecastData);
 

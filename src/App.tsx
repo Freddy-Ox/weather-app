@@ -1,9 +1,10 @@
 import { useState, useEffect, FormEvent } from "react";
 import { API_KEY } from "./API/api.ts";
-
+import { CurrentWeather } from "./types/WeatherData.ts";
 import HourlyForecast from "./components/HourlyForecast.tsx";
 import { InfoPanels } from "./components/InfoPanels.tsx";
 import "./index.css";
+import Favourites from "./components/Favourites.tsx";
 
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
@@ -17,7 +18,7 @@ async function getWeather(city: string) {
 
   const json = await response.json();
 
-  const weatherData: WeatherData = {
+  const weatherData: CurrentWeather = {
     city: json.name,
     temperature: json.main.temp,
     feels_like: json.main.feels_like,
@@ -35,15 +36,23 @@ async function getWeather(city: string) {
 }
 
 export default function WeatherComponent() {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
+  const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [city, setCity] = useState("aarhus");
+  const [favourites, setFavourites] = useState<string[]>([]);
 
   useEffect(() => {
     getWeather(city)
       .then(setWeatherData)
       .catch((err) => setError(err));
   }, [city]);
+
+  useEffect(() => {
+    const storedFavourites = localStorage.getItem("favourites");
+    if (storedFavourites) {
+      setFavourites(JSON.parse(storedFavourites));
+    }
+  }, []);
 
   if (error) return <p>Error: {error}</p>;
   if (!weatherData) return <p>Loading...</p>;
@@ -54,6 +63,14 @@ export default function WeatherComponent() {
     const cityName = formData.get("city") as string;
 
     setCity(cityName);
+  }
+
+  function handleAddToFavourites() {
+    if (city && !favourites.includes(city)) {
+      const updatedFavourites = [...favourites, city];
+      setFavourites(updatedFavourites);
+      localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
+    }
   }
 
   return (
@@ -72,7 +89,17 @@ export default function WeatherComponent() {
           Search
         </button>
       </form>
-      <h1 className="text-2xl mt-2">Weather right now in {city}</h1>
+
+      <Favourites favourites={favourites} setCity={setCity}></Favourites>
+      <h1 className="text-2xl mt-2">
+        Weather right now in {city.toUpperCase()}
+      </h1>
+      <button
+        onClick={handleAddToFavourites}
+        className="ml-2 bg-transparent px-4 py-2 rounded-lg shadow-md mt-2"
+      >
+        Add to Favourites
+      </button>
       <div className="w-[1000px] h-[200px] max-w-[1800px] flex justify-center mt-8 mb-8">
         <InfoPanels data={weatherData} />
       </div>
