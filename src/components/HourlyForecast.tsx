@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_KEY } from "../API/api.ts";
 import { HourlyForecastData } from "../types/WeatherData.ts";
+import { Component } from "./DisplayHourlyForecast.tsx";
 const BASE_URL = "https://pro.openweathermap.org/data/2.5/forecast/hourly";
 
 type HourlyForecastProps = {
@@ -21,6 +22,17 @@ function mapHourlyForecast(data: any): HourlyForecastData {
   };
 }
 
+function formatHourlyChartData(hourlyData: HourlyForecastData[]) {
+  const chartDataHourly = hourlyData.map((elem) => {
+    return {
+      time: elem.time,
+      temp: elem.temperature,
+      feels_like: elem.feels_like,
+    };
+  });
+  return chartDataHourly;
+}
+
 async function getHourlyForecast(cityName: string) {
   const response = await fetch(
     `${BASE_URL}?q=${cityName}&appid=${API_KEY}&units=metric`
@@ -29,7 +41,7 @@ async function getHourlyForecast(cityName: string) {
   if (!response.ok) {
     throw new Error("data fetching failed");
   }
-  
+
   const jsonResponse = await response.json();
   const hourlyForecastArray = jsonResponse.list.map(mapHourlyForecast);
 
@@ -43,10 +55,7 @@ export default function HourlyForecast({ cityName }: HourlyForecastProps) {
     getHourlyForecast(cityName).then(setHourlyForecastData);
   }, [cityName]);
 
-  console.log(hourlyForecastData)
+  const chartDataHourly = formatHourlyChartData(hourlyForecastData);
 
-  return (
-    <>
-    </>
-  );
+  return <Component chartData={chartDataHourly}></Component>;
 }

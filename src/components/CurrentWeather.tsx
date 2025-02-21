@@ -1,10 +1,10 @@
 import { CurrentWeather } from "../types/WeatherData.ts";
 
 type WeatherProps = {
-    weatherProps: CurrentWeather
-}
+  weatherProps: CurrentWeather;
+};
 
-export default function DisplayWeather({weatherProps}: WeatherProps) {
+export default function DisplayWeather({ weatherProps }: WeatherProps) {
   const date = new Date(weatherProps.time * 1000);
 
   return (

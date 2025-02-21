@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import {
   Card,
@@ -10,7 +10,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -18,38 +18,49 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+} from "@/components/ui/chart";
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  temp: {
+    label: "Temp",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
+  feels_like: {
+    label: "Feels like",
     color: "hsl(var(--chart-2))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
-export function Component() {
+type ChartData = {
+  time: string;
+  temp: number;
+  feels_like: number;
+};
+
+type ChartProps = {
+  chartData: ChartData[];
+};
+
+// determine appropriate domain for Y-axis
+
+export function Component({ chartData }: ChartProps) {
+  const maxVal = Math.round(
+    Math.max(...chartData.map((chartData) => chartData.temp)) * 1.1
+  );
+  const minVal = Math.round(
+    Math.min(...chartData.map((chartData) => chartData.feels_like)) * 0.9
+  );
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Area Chart - Legend</CardTitle>
+        <CardTitle>4-Day Hourly Temperature Forecast</CardTitle>
         <CardDescription>
-          Showing total visitors for the last 6 months
+          Showing predicted temperature as well as 'feels like' temperature
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-[400px] w-[1000px]">
           <AreaChart
             accessibilityLayer
             data={chartData}
@@ -60,37 +71,36 @@ export function Component() {
           >
             <CartesianGrid vertical={false} />
             <XAxis
-              dataKey="month"
-              tickLine={false}
+              dataKey="time"
+              tickLine={true}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => value.slice(10, 16)}
             />
+            <YAxis domain={[minVal, maxVal]}></YAxis>
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent indicator="line" />}
             />
             <Area
-              dataKey="mobile"
+              dataKey="feels_like"
               type="natural"
-              fill="var(--color-mobile)"
+              fill="var(--color-feels_like)"
               fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
+              stroke="var(--color-feels_like)"
             />
             <Area
-              dataKey="desktop"
+              dataKey="temp"
               type="natural"
-              fill="var(--color-desktop)"
+              fill="var(--color-temp)"
               fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
+              stroke="var(--color-temp)"
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
+      {/*       <CardFooter>
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">
@@ -101,7 +111,7 @@ export function Component() {
             </div>
           </div>
         </div>
-      </CardFooter>
+      </CardFooter> */}
     </Card>
-  )
+  );
 }

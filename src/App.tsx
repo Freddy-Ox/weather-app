@@ -1,10 +1,9 @@
 import { useState, useEffect, FormEvent } from "react";
 import { API_KEY } from "./API/api.ts";
-import DisplayWeather from "./components/CurrentWeather.tsx";
-import HourlyForecast from "./components/HourlyForecast.tsx";
-import { Component } from "./components/DisplayHourlyForecast.tsx";
-import "./index.css";
 
+import HourlyForecast from "./components/HourlyForecast.tsx";
+import { InfoPanels } from "./components/InfoPanels.tsx";
+import "./index.css";
 
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
@@ -38,7 +37,7 @@ async function getWeather(city: string) {
 export default function WeatherComponent() {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [city, setCity] = useState("randers");
+  const [city, setCity] = useState("aarhus");
 
   useEffect(() => {
     getWeather(city)
@@ -57,12 +56,15 @@ export default function WeatherComponent() {
     setCity(cityName);
   }
 
-  
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen text-center mt-6">
       <form onSubmit={(event) => handleSubmit(event)}>
-        <input type="text" name="city" className="border p-2 rounded-md" />
+        <input
+          type="text"
+          placeholder="search for a city..."
+          name="city"
+          className="border-2 border-gray-300 rounded-md px-4 py-2 text-black bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         <button
           type="submit"
           className="ml-2 bg-blue-500 text-white px-4 py-2 rounded-md"
@@ -70,8 +72,11 @@ export default function WeatherComponent() {
           Search
         </button>
       </form>
-      <DisplayWeather weatherProps={weatherData}></DisplayWeather>
-      <Component></Component>
+      <h1 className="text-2xl mt-2">Weather right now in {city}</h1>
+      <div className="w-[1000px] h-[200px] max-w-[1800px] flex justify-center mt-8 mb-8">
+        <InfoPanels data={weatherData} />
+      </div>
+      <HourlyForecast cityName={city}></HourlyForecast>
     </div>
   );
 }
