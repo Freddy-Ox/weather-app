@@ -12,8 +12,6 @@ import {
   TableRow,
 } from "../components/ui/table";
 
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
-
 type ButtonProps = {
   favourites: string[];
   setCity: React.Dispatch<React.SetStateAction<string>>;
