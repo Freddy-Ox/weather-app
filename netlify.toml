@@ -1,3 +1,6 @@
 [build]
-  command = "echo \"export const API_KEY='${API_KEY}';\" > src/API/api.ts && vite build"
+  command = "mkdir -p src/API && echo \"export const API_KEY='${API_KEY}'\" > src/API/api.ts && vite build"
   publish = "dist"
+
+[context.production.environment]
+  API_KEY = "140e957ecd4a919cadefd31d8a9a177a"
