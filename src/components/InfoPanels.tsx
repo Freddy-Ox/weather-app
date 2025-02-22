@@ -1,26 +1,14 @@
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
 import { CurrentWeather } from "../types/WeatherData.tsx";
-import {
-  WiStrongWind,
-  WiWindy,
-  WiThermometer,
-  WiDaySunny,
-  WiCloud,
-  WiRain,
-  WiSnow,
-  WiThunderstorm,
-} from "react-icons/wi";
+import { WiStrongWind, WiThermometer } from "react-icons/wi";
 
 type InfoPanelsProps = {
   data: CurrentWeather;
 };
 
 export function InfoPanels({ data }: InfoPanelsProps) {
+    
   return (
     <>
       <ResizablePanelGroup direction="horizontal" className="rounded-lg border">
@@ -31,7 +19,9 @@ export function InfoPanels({ data }: InfoPanelsProps) {
               Windspeeds of {Math.round(data.wind_speed)} m/s
             </p>
             <p className="text-lg">
-              {isNaN(data.wind_gusts) ? "Calm winds with no gusts" : `Gusts of ${Math.round(data.wind_gusts)} m/s`}
+              {isNaN(data.wind_gusts)
+                ? "Calm winds with no gusts"
+                : `Gusts of ${Math.round(data.wind_gusts)} m/s`}
             </p>
           </div>
         </ResizablePanel>

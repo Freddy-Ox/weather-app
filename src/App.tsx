@@ -1,39 +1,12 @@
 import { useState, useEffect, FormEvent } from "react";
-import { API_KEY } from "./API/api.ts";
 import { CurrentWeather } from "./types/WeatherData.ts";
 import HourlyForecast from "./components/HourlyForecast.tsx";
 import { InfoPanels } from "./components/InfoPanels.tsx";
 import "./index.css";
 import Favourites from "./components/Favourites.tsx";
+import { getWeather } from "./utils/utils.ts";
 
-const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-async function getWeather(city: string) {
-  const response = await fetch(
-    `${BASE_URL}?q=${city}&appid=${API_KEY}&units=metric`
-  );
-  if (!response.ok) {
-    throw new Error("error fetching data");
-  }
-
-  const json = await response.json();
-
-  const weatherData: CurrentWeather = {
-    city: json.name,
-    temperature: json.main.temp,
-    feels_like: json.main.feels_like,
-    description: json.weather[0].description,
-    icon: json.weather[0].icon,
-    wind_speed: json.wind.speed,
-    wind_gusts: json.wind.gust,
-    wind_direction: json.wind.deg,
-    cloudiness: json.clouds.all,
-    sunrise: json.sunrise,
-    sunset: json.sunset,
-    time: json.dt,
-  };
-  return weatherData;
-}
 
 export default function WeatherComponent() {
   const [weatherData, setWeatherData] = useState<CurrentWeather | null>(null);
@@ -42,17 +15,27 @@ export default function WeatherComponent() {
   const [favourites, setFavourites] = useState<string[]>([]);
 
   useEffect(() => {
-    getWeather(city)
-      .then(setWeatherData)
-      .catch((err) => setError(err));
-  }, [city]);
-
-  useEffect(() => {
     const storedFavourites = localStorage.getItem("favourites");
     if (storedFavourites) {
       setFavourites(JSON.parse(storedFavourites));
     }
   }, []);
+
+  useEffect(() => {
+    getWeather(city)
+      .then(setWeatherData)
+      .catch((err) => setError(err));
+  }, [city]);
+
+  
+
+  function handleAddToFavourites() {
+    if (city && !favourites.includes(city)) {
+      const updatedFavourites = [...favourites, city];
+      setFavourites(updatedFavourites);
+      localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
+    }
+  }
 
   if (error) return <p>Error: {error}</p>;
   if (!weatherData) return <p>Loading...</p>;
@@ -65,13 +48,7 @@ export default function WeatherComponent() {
     setCity(cityName);
   }
 
-  function handleAddToFavourites() {
-    if (city && !favourites.includes(city)) {
-      const updatedFavourites = [...favourites, city];
-      setFavourites(updatedFavourites);
-      localStorage.setItem("favourites", JSON.stringify(updatedFavourites));
-    }
-  }
+  console.log(weatherData);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-center mt-6">
@@ -100,9 +77,11 @@ export default function WeatherComponent() {
       >
         Add to Favourites
       </button>
-      <div className="w-[1000px] h-[200px] max-w-[1800px] flex justify-center mt-8 mb-8">
-        <InfoPanels data={weatherData} />
-      </div>
+      {
+        <div className="w-[1000px] h-[200px] max-w-[1800px] flex justify-center mt-8 mb-8">
+          <InfoPanels data={weatherData} />
+        </div>
+      }
       <HourlyForecast cityName={city}></HourlyForecast>
     </div>
   );
